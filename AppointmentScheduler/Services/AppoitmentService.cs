@@ -18,13 +18,8 @@ namespace AppointmentScheduler.Services
         public async Task<int> AddUpdateAppointment(AppointmentVM model)
         {
 
-            // Define the expected DateTime format for 'model.StartDate'
-            string dateFormat = "M/d/yyyy h:mm tt"; // Example format, adjust as needed
-
-            // Attempt to parse 'model.StartDate' using the specified format
+            string dateFormat = "M/d/yyyy h:mm tt"; 
             var startDate = DateTime.ParseExact(model.StartDate, dateFormat, CultureInfo.InvariantCulture);
-
-            // Calculate 'endDate' by adding the specified duration in minutes
             var endDate = startDate.AddMinutes(Convert.ToDouble(model.Duration));
 
             //var startDate = DateTime.Parse(model.StartDate);
