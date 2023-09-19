@@ -24,9 +24,9 @@ namespace AppointmentScheduler.Controllers.Api
 
         }                                                 // pass the Interface and Implimentation Class then we acces it here as a 
 
-        [HttpPost("SaveCalendarData")]
+        [HttpPost("Appointment/SaveCalendarData")]
 
-        public IActionResult SaveCalendarData(AppointmentVM model)
+        public IActionResult SaveCalendarData([FromBody] AppointmentVM model)
         {
             CommonResponse<int> commonResponse = new CommonResponse<int>();
             try

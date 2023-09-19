@@ -1,7 +1,10 @@
-﻿namespace AppointmentScheduler.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace AppointmentScheduler.Models
 {
     public class Appointment
     {
+        [Key]
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
