@@ -1,6 +1,7 @@
 ﻿using AppointmentScheduler.Models;
 using AppointmentScheduler.Models.ViewModels;
 using AppointmentScheduler.Utilty;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
@@ -9,9 +10,13 @@ namespace AppointmentScheduler.Services
     public class AppoitmentService : IAppoitmentService
     {
         private readonly ApplicationDbContext _db;
-        public AppoitmentService(ApplicationDbContext db)
+        // user Mananger
+        UserManager<ApplicationUser> _userManager;
+        public AppoitmentService(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
         {
             _db = db;
+
+            _userManager = userManager;
             
         }
 
@@ -53,29 +58,94 @@ namespace AppointmentScheduler.Services
             }
         }
 
-        public async Task<AppointmentVM> DoctorsEventById(string doctorId)
+       
+        public async Task<List<DoctorVM>> GetDoctorList()
         {
-            var appointment = await _db.Appointments
-                .Where(x => x.DoctorId == doctorId)
-                .Select(c => new AppointmentVM()
-                {
-                    Id = c.Id,
-                    Title = c.Title,
-                    Description = c.Description,
-                    StartDate = c.StartDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                    EndDate = c.EndDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                    Duration = c.Duration,
-                    isDoctorApproved = c.isDoctorApproved
-                })
-                .FirstOrDefaultAsync();
+            // one method to get dropdown using query
+            //var doctors = (from user in _db.Users 
+            //                join userRoles in _db.UserRoles on user.Id equals userRoles.UserId
+            //                join roles in _db.Roles.Where(x=>x.Name == Helper.Doctor) on userRoles.RoleId equals roles.Id
+            //               select new DoctorVM
+            //               {
+            //                   Id = user.Id ,
+            //                   Name = user.Name
+            //               }
+            //               ).ToList();
+            //return doctors;
+            // 2nd method to get dropdown using userManager and RoleAsyn
+            var doctors = await _userManager.GetUsersInRoleAsync(Utilty.Helper.Doctor);
+            var doctorsVM = doctors.Select(user => new DoctorVM()
+            {
+                Id = user.Id,
+                Name = user.Name
 
-            return appointment;
+            }).ToList();
+
+            return doctorsVM;
+        }
+
+        public async Task<List<PatientVM>> GetPatientList()
+        {
+            var patients = await _userManager.GetUsersInRoleAsync(Utilty.Helper.Patient);
+            var patientsVM = patients.Select(user => new PatientVM()
+            {
+                Id = user.Id,
+                Name = user.Name
+
+            }).ToList();
+
+            return patientsVM;
+        }
+
+
+
+
+        public List<AppointmentVM> DoctorsEventById(string doctorId)
+        {
+            return _db.Appointments.Where(x => x.DoctorId == doctorId).ToList().Select(c => new AppointmentVM()
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Description = c.Description,
+                StartDate = c.StartDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                EndDate = c.EndDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                Duration = c.Duration,
+                isDoctorApproved = c.isDoctorApproved,
+                //PatientId = c.PatientId,
+                //DoctorId = c.DoctorId,
+                //PatientName = _db.Users.Where(x => x.Id == c.PatientId).Select(x => x.Name).FirstOrDefault(),
+                //DoctorName = _db.Users.Where(x => x.Id == c.DoctorId).Select(x => x.Name).FirstOrDefault()
+
+            }).ToList();
+
+          //  return appointments;
+
         }
 
         public AppointmentVM GetById(int id)
         {
-            var appointment = _db.Appointments
-               .Where(x => x.Id == id)
+            //var appointment = _db.Appointments
+            //   .Where(x => x.Id == id)
+            //   .Select(c => new AppointmentVM()
+            //   {
+            //       Id = c.Id,
+            //       Title = c.Title,
+            //       Description = c.Description,
+            //       StartDate = c.StartDate.ToString("yyyy-MM-dd HH:mm:ss"),
+            //       EndDate = c.EndDate.ToString("yyyy-MM-dd HH:mm:ss"),
+            //       Duration = c.Duration,
+            //       isDoctorApproved = c.isDoctorApproved,
+            //       //PatientId = c.PatientId,
+            //       //DoctorId = c.DoctorId,
+            //       //PatientName = _db.Users.Where(x => x.Id == c.PatientId).Select(x => x.Name).FirstOrDefault(),
+            //       //DoctorName = _db.Users.Where(x => x.Id == c.DoctorId).Select(x => x.Name).FirstOrDefault()
+            //   }).SingleOrDefault();
+
+            //return appointment;
+
+
+            return _db.Appointments
+               .Where(x => x.Id == id).ToList()
                .Select(c => new AppointmentVM()
                {
                    Id = c.Id,
@@ -87,58 +157,31 @@ namespace AppointmentScheduler.Services
                    isDoctorApproved = c.isDoctorApproved,
                    PatientId = c.PatientId,
                    DoctorId = c.DoctorId,
-                   PatientName = _db.Users.Where(x=> x.Id == c.PatientId).Select(x=> x.Name).FirstOrDefault(),
+                   PatientName = _db.Users.Where(x => x.Id == c.PatientId).Select(x => x.Name).FirstOrDefault(),
                    DoctorName = _db.Users.Where(x => x.Id == c.DoctorId).Select(x => x.Name).FirstOrDefault()
                }).SingleOrDefault();
-
-            return appointment;
         }
 
-        public List<DoctorVM> GetDoctorList()
+        public List<AppointmentVM> PatientsEventById(string patientId)
         {
-            var doctors = (from user in _db.Users 
-                            join userRoles in _db.UserRoles on user.Id equals userRoles.UserId
-                            join roles in _db.Roles.Where(x=>x.Name == Helper.Doctor) on userRoles.RoleId equals roles.Id
-                           select new DoctorVM
-                           {
-                               Id = user.Id ,
-                               Name = user.Name
-                           }
-                           ).ToList();
-            return doctors;
+            return _db.Appointments.Where(x => x.PatientId == patientId).ToList().Select(c => new AppointmentVM()
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Description = c.Description,
+                StartDate = c.StartDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                EndDate = c.EndDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                Duration = c.Duration,
+                isDoctorApproved = c.isDoctorApproved,
+                //PatientId = c.PatientId,
+                //DoctorId = c.DoctorId,
+                //PatientName = _db.Users.Where(x => x.Id == c.PatientId).Select(x => x.Name).FirstOrDefault(),
+                //DoctorName = _db.Users.Where(x => x.Id == c.DoctorId).Select(x => x.Name).FirstOrDefault()
+
+            }).ToList();
+
+           // return appointments;
+
         }
-
-        public List<PatientVM> GetPatientList()
-        {
-            var patient = (from user in _db.Users
-                           join userRoles in _db.UserRoles on user.Id equals userRoles.UserId
-                           join roles in _db.Roles.Where(x => x.Name == Helper.Patient) on userRoles.RoleId equals roles.Id
-                           select new PatientVM
-                           {
-                               Id = user.Id,
-                               Name = user.Name
-                           }).ToList();
-            return patient;
-        }
-
-        public async Task<AppointmentVM> PatientsEventById(string patientId)
-        {
-            var appointment = await _db.Appointments
-                .Where(x => x.PatientId == patientId)
-                .Select(c => new AppointmentVM()
-                {
-                    Id = c.Id,
-                    Title = c.Title,
-                    Description = c.Description,
-                    StartDate = c.StartDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                    EndDate = c.EndDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                    Duration = c.Duration,
-                    isDoctorApproved = c.isDoctorApproved
-                })
-                .FirstOrDefaultAsync();
-
-            return appointment;
-        }
-
     }
 }

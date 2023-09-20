@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Security.Claims;
 
+
 namespace AppointmentScheduler.Controllers
 {
     public class AppointmentController : Controller
@@ -25,12 +26,12 @@ namespace AppointmentScheduler.Controllers
             role = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
         }                                                 // pass the Interface and Implimentation Class then we acces it here as a 
                                                           // dependency injection
-        public IActionResult Index()
+        public  async Task<IActionResult> Index()
         {
             ViewBag.Duration = Helper.GetTimeDropDown();
-            ViewBag.doctorDropDownList = _appoitmentService.GetDoctorList();
+            ViewBag.doctorDropDownList = await _appoitmentService.GetDoctorList();
 
-            ViewBag.patientDropDownList = _appoitmentService.GetPatientList();
+            ViewBag.patientDropDownList = await _appoitmentService.GetPatientList();
             return View();
         }
 
@@ -45,16 +46,16 @@ namespace AppointmentScheduler.Controllers
                 commonResponse.status = _appoitmentService.AddUpdateAppointment(model).Result;
                 if (commonResponse.status == 2)
                 {
-                    commonResponse.mesesage = Helper.appointmentAdded;
+                    commonResponse.message = Helper.appointmentAdded;
                 }
                 if (commonResponse.status == 1)
                 {
-                    commonResponse.mesesage = Helper.appointmentUpdated;
+                    commonResponse.message = Helper.appointmentUpdated;
                 }
             }
             catch (Exception e)
             {
-                commonResponse.mesesage = e.Message;
+                commonResponse.message = e.Message;
                 commonResponse.status = Helper.failure_code;
 
             }
@@ -62,36 +63,37 @@ namespace AppointmentScheduler.Controllers
         }
 
         [HttpGet("Appointment/GetCalendarData")]
-        public async Task<IActionResult> GetCalendarData(string doctorId)
+        public  IActionResult GetCalendarData(string doctorId)
         {
-            CommonResponse<AppointmentVM> commonResponse = new CommonResponse<AppointmentVM>();
+            CommonResponse<List<AppointmentVM>> commonResponse = new CommonResponse<List<AppointmentVM>>();
 
             try
             {
                 if (role == Helper.Patient)
                 {
-                    commonResponse.dataemum = await _appoitmentService.PatientsEventById(loginUserId);
+                    commonResponse.dataemum =  _appoitmentService.PatientsEventById(loginUserId);
                     commonResponse.status = Helper.success_code;
                 }
                 else if (role == Helper.Doctor)
                 {
-                    commonResponse.dataemum = await _appoitmentService.DoctorsEventById(loginUserId);
+                    commonResponse.dataemum =  _appoitmentService.DoctorsEventById(loginUserId);
                     commonResponse.status = Helper.success_code;
                 }
                 else
                 {
-                    commonResponse.dataemum = await _appoitmentService.DoctorsEventById(doctorId);
+                    commonResponse.dataemum =  _appoitmentService.DoctorsEventById(doctorId);
                     commonResponse.status = Helper.success_code;
                 }
             }
             catch (Exception e)
             {
-                commonResponse.mesesage = e.Message;
+                commonResponse.message = e.Message;
                 commonResponse.status = Helper.failure_code;
             }
 
             return Ok(commonResponse);
         }
+
         [HttpGet("Appointment/GetCalendarDataById/{id}")]
         public  IActionResult GetCalendarDataById(int id)
         {
@@ -106,7 +108,7 @@ namespace AppointmentScheduler.Controllers
             }
             catch (Exception e)
             {
-                commonResponse.mesesage = e.Message;
+                commonResponse.message = e.Message;
                 commonResponse.status = Helper.failure_code;
             }
 

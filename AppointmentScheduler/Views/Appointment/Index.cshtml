@@ -4,7 +4,8 @@
         {
             <div class="form-group row col-2" id="divDoctorList">
                 <label>Select Doctor</label>
-                @Html.DropDownList("doctorId", new SelectList(ViewBag.doctorDropDownList, "Id", "Name"), new { @class = "form-control select2"})
+                @Html.DropDownList("doctorId", new SelectList(ViewBag.doctorDropDownList, "Id", "Name"), new { @class = "form-control select2",
+            @onChange="OnSelectDoctorChange()"})
             </div>
         }
         <div id="calendar"></div>

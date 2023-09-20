@@ -2,6 +2,8 @@
 $(document).ready(function () {
     $("#appointmentDate").kendoDateTimePicker({
         value: new Date(),
+          //var formattedDate = moment(obj.startStr).format("M/D/YYYY h:mm A");
+    //$("#appointmentDate").val(formattedDate);
         dateInput: false
     });
 
@@ -14,7 +16,7 @@ function InitializeCalendar() {
 
         var calendarEl = document.getElementById('calendar');
         if (calendarEl != null) {
-            calendar = new FullCalendar.Calendar(calendarEl, {
+           calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 headerToolbar: {
                     left: 'prev,next,today',
@@ -25,18 +27,21 @@ function InitializeCalendar() {
                 editable: false,
                 select: function (event) {
                     onShowModal(event, null);
-
                 },
+                
                 eventDisplay: 'block',
                 events: function (fetch, successCallback, failureCallback) {
+                    //debugger;
                     $.ajax({
                         url: routeURL + '/Appointment/GetCalendarData?doctorId=' + $("#doctorId").val(),
                         type: 'GET',
                         dataType: 'JSON',
                         success: function (response) {
+                            //debugger;
                             var events = [];
                             if (response.status === 1) {
-                                $.each(response.dataenum, function (i, data) {
+                                
+                                $.each(response.dataemum, function (i, data) {
                                     events.push({
                                         title: data.title,
                                         description: data.description,
@@ -50,6 +55,7 @@ function InitializeCalendar() {
                                 })
                             }
                             successCallback(events);
+                           // debugger;
                         },
                         error: function (xhr) {
                             $.notify("Error", "error");
@@ -80,11 +86,28 @@ function onShowModal(obj, isEventDetail) {
         $("#doctorId").val(obj.doctorId);
         $("#patientId").val(obj.patientId);
         $("#id").val(obj.id);
-        }
+        $("#lblPatientName").html(obj.patientName);
+        $("#lblDoctorName").html(obj.doctorName);
+
+    }
+    else {
+    var formattedDate = moment(obj.startStr).format("M/D/YYYY h:mm A");
+    $("#appointmentDate").val(formattedDate);
+    }
+
+
     $("#appointmentInput").modal("show");
 }
 
 function onCloseModal() {
+    $("#appointmentForm")[0].reset();
+    $("#id").val(0),
+    $("#title").val('');
+    $("#description").val('');
+    $("#appointmentDate").val('');
+    $("#duration").val('');
+    $("#patientId").val('');
+    //debugger;
     $("#appointmentInput").modal("hide");
 }
 
@@ -107,6 +130,8 @@ function onSubmitForm() {
             contentType: 'application/json',
             success: function (response) {
                 if (response.status === 1 || response.status === 2) {
+                    calendar.refetchEvents();
+                //    debugger;
                     $.notify(response.message, "success");
                     onCloseModal();
                 }
@@ -144,19 +169,25 @@ function checkValidation() {
 }
 
 function getEventDetailsByEventId(info) {
+  //  debugger;
     $.ajax({
         url: routeURL + '/Appointment/GetCalendarDataById/' + info.id,
         type: 'GET',
         dataType: 'JSON',
         success: function (response) {
-
-            if (response.status === 1 && response.dataenum !== undefined) {
-                onShowModal(response.dataenum, true);
+          //  debugger;
+            if (response.status === 1 && response.dataemum !== undefined) {
+                
+                onShowModal(response.dataemum, true);
             }
-            successCallback(events);
+           // successCallback(events);
         },
         error: function (xhr) {
             $.notify("Error", "error");
         }
     });
+}
+
+function OnSelectDoctorChange() {
+    calendar.refetchEvents();
 }

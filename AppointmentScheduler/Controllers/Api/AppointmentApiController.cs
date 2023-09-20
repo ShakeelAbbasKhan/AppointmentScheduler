@@ -24,7 +24,7 @@ namespace AppointmentScheduler.Controllers.Api
 
         }                                                 // pass the Interface and Implimentation Class then we acces it here as a 
 
-        [HttpPost("Appointment/SaveCalendarData")]
+        [HttpPost("SaveCalendarData")]
 
         public IActionResult SaveCalendarData([FromBody] AppointmentVM model)
         {
@@ -34,20 +34,22 @@ namespace AppointmentScheduler.Controllers.Api
                 commonResponse.status = _appoitmentService.AddUpdateAppointment(model).Result;
                 if(commonResponse.status == 2)
                 {
-                    commonResponse.mesesage = Helper.appointmentAdded;
+                    commonResponse.message = Helper.appointmentAdded;
                 }
                 if (commonResponse.status == 1)
                 {
-                    commonResponse.mesesage = Helper.appointmentUpdated;
+                    commonResponse.message = Helper.appointmentUpdated;
                 }
             }
             catch(Exception e)
             {
-                commonResponse.mesesage = e.Message;
+                commonResponse.message = e.Message;
                 commonResponse.status = Helper.failure_code;
 
             }
             return Ok(commonResponse);
         }
+
+        //public enum DataEnum {a,b,c }
     }
 }
