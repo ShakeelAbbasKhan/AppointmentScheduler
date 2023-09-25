@@ -19,6 +19,16 @@ builder.Services.AddTransient<IAppoitmentService, AppoitmentService>();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddHttpContextAccessor();
 
+//configure the AddDistributedMemoryCache for sessions
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options=>
+{
+    options.IdleTimeout = TimeSpan.FromDays(10);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 
 
 // Add services to the container.
@@ -42,6 +52,7 @@ app.UseRouting();
 app.UseAuthentication();
 
 app.UseAuthorization();
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

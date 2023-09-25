@@ -16,6 +16,9 @@ namespace AppointmentScheduler.Utilty
         public static string appointmentExists = "Appointment for select date and time already exist.";
         public static string appointmentNotExists = "Appointment Not Exists.";
 
+        public static string appointmentConfirm = "Appointment Confrim.";
+        public static string appointmentConfrimError = "Error while confriming the appointment.";
+
         public static string appointmentAddError = "Something went wrong, please try again.";
         public static string appointmentUpdateError = "Something went wrong, please try again.";
         public static string somethingWentWrong = "Something went wrong, please try again.";

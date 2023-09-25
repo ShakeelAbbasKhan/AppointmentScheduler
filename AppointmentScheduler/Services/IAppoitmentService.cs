@@ -12,6 +12,9 @@ namespace AppointmentScheduler.Services
 
         public AppointmentVM GetById(int id);       // to show related data in view model
 
+        public Task<int> ConfirmEvent(int id);
+        public Task<int> DeleteEvent(int id);
+
 
     }
 }

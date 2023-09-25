@@ -111,11 +111,6 @@ namespace AppointmentScheduler.Services
                 EndDate = c.EndDate.ToString("yyyy-MM-dd HH:mm:ss"),
                 Duration = c.Duration,
                 isDoctorApproved = c.isDoctorApproved,
-                //PatientId = c.PatientId,
-                //DoctorId = c.DoctorId,
-                //PatientName = _db.Users.Where(x => x.Id == c.PatientId).Select(x => x.Name).FirstOrDefault(),
-                //DoctorName = _db.Users.Where(x => x.Id == c.DoctorId).Select(x => x.Name).FirstOrDefault()
-
             }).ToList();
 
           //  return appointments;
@@ -124,24 +119,7 @@ namespace AppointmentScheduler.Services
 
         public AppointmentVM GetById(int id)
         {
-            //var appointment = _db.Appointments
-            //   .Where(x => x.Id == id)
-            //   .Select(c => new AppointmentVM()
-            //   {
-            //       Id = c.Id,
-            //       Title = c.Title,
-            //       Description = c.Description,
-            //       StartDate = c.StartDate.ToString("yyyy-MM-dd HH:mm:ss"),
-            //       EndDate = c.EndDate.ToString("yyyy-MM-dd HH:mm:ss"),
-            //       Duration = c.Duration,
-            //       isDoctorApproved = c.isDoctorApproved,
-            //       //PatientId = c.PatientId,
-            //       //DoctorId = c.DoctorId,
-            //       //PatientName = _db.Users.Where(x => x.Id == c.PatientId).Select(x => x.Name).FirstOrDefault(),
-            //       //DoctorName = _db.Users.Where(x => x.Id == c.DoctorId).Select(x => x.Name).FirstOrDefault()
-            //   }).SingleOrDefault();
-
-            //return appointment;
+           
 
 
             return _db.Appointments
@@ -173,15 +151,33 @@ namespace AppointmentScheduler.Services
                 EndDate = c.EndDate.ToString("yyyy-MM-dd HH:mm:ss"),
                 Duration = c.Duration,
                 isDoctorApproved = c.isDoctorApproved,
-                //PatientId = c.PatientId,
-                //DoctorId = c.DoctorId,
-                //PatientName = _db.Users.Where(x => x.Id == c.PatientId).Select(x => x.Name).FirstOrDefault(),
-                //DoctorName = _db.Users.Where(x => x.Id == c.DoctorId).Select(x => x.Name).FirstOrDefault()
-
+     
             }).ToList();
 
            // return appointments;
 
+        }
+
+        public async Task<int> ConfirmEvent(int id)
+        {
+            var appointments = _db.Appointments.FirstOrDefault(x => x.Id == id);
+            if (appointments !=null)
+            {
+                appointments.isDoctorApproved = true;
+                return await _db.SaveChangesAsync();
+            }
+            return 0;
+        }
+
+        public async Task<int> DeleteEvent(int id)
+        {
+            var appointments = _db.Appointments.FirstOrDefault(x => x.Id == id);
+            if (appointments != null)
+            {
+                _db.Appointments.Remove(appointments);
+                return await _db.SaveChangesAsync();
+            }
+            return 0;
         }
     }
 }
