@@ -2,19 +2,34 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 <div class="row">
+    @if (TempData.ContainsKey("newAdminSignUp"))
+    {
+        <div class="container">
+            <div class="alert alert-success alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">x</a>
+                <strong>Account created for @TempData["newAdminSignUp"].ToString()</strong>
+            </div>
+        </div>
+    }
     <div class="container">
         @if(User.IsInRole(AppointmentScheduler.Utilty.Helper.Admin))
         {
-            <div class="form-group row col-2" id="divDoctorList">
+            <div class="row">
+            <div class="form-group col-4" id="divDoctorList">
                 <label>Select Doctor</label>
-                @Html.DropDownList("doctorId", new SelectList(ViewBag.doctorDropDownList, "Id", "Name"), new { @class = "form-control select2",
-            @onChange="OnSelectDoctorChange()"})
+                @Html.DropDownList("doctorId", new SelectList(ViewBag.doctorDropDownList, "Id", "Name"), 
+                new { @class = "form-control select2",@onChange="OnSelectDoctorChange()"})
+            </div>
+            <div class="col-3 offset-5">
+                <a asp-controller="Account" asp-action="Register" class="btn btn-secondary">Admin Registration</a>
+            </div>
             </div>
         }
         <div id="calendar"></div>
     </div>
 </div>
 <partial name="_AddEditAppointment" /> 
+@* @Html.Partial("_AddEditAppointment") *@       @* 2nd method to reder partial view *@
 
 <div class="text-right pt-2">
     <p>@HttpContextAccessor.HttpContext.Session.GetString("ssuserName") 's account is logged in</p>

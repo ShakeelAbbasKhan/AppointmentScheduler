@@ -16,6 +16,8 @@ namespace AppointmentScheduler.Controllers
         public IActionResult Index()
         {
             return View();
+            return PartialView();
+            return Json(new { name = "Ali", Class = "ninth" });
         }
 
         public IActionResult Privacy()

@@ -48,13 +48,14 @@ namespace AppointmentScheduler.Controllers
         }
         public async Task<IActionResult> Register()
         {
-            if(!_roleManager.RoleExistsAsync(Helper.Admin).GetAwaiter().GetResult())
-            {
-                 await _roleManager.CreateAsync(new IdentityRole(Helper.Admin));
-                 await _roleManager.CreateAsync(new IdentityRole(Helper.Doctor));
-                 await _roleManager.CreateAsync(new IdentityRole(Helper.Patient));
+            // now through DB Initialzier It can be done
+            //if(!_roleManager.RoleExistsAsync(Helper.Admin).GetAwaiter().GetResult())
+            //{
+            //     await _roleManager.CreateAsync(new IdentityRole(Helper.Admin));
+            //     await _roleManager.CreateAsync(new IdentityRole(Helper.Doctor));
+            //     await _roleManager.CreateAsync(new IdentityRole(Helper.Patient));
 
-            }
+            //}
             return View();
         }
 
@@ -74,8 +75,15 @@ namespace AppointmentScheduler.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, model.RoleName);
-                    await _signInManager.SignInAsync(user, isPersistent: false);   // if account has been created then we can automatically sign in to new user
-                    return RedirectToAction("Index", "Home");    
+                    if (!User.IsInRole(Helper.Admin))
+                    {
+                        await _signInManager.SignInAsync(user, isPersistent: false);   // if account has been created then we can automatically sign in to new user
+                    }
+                    else
+                    {
+                        TempData["newAdminSignUp"] = user.Name;
+                    }
+                    return RedirectToAction("Index", "Appointment");    
                 }
                 foreach(var error in result.Errors) 
                 {

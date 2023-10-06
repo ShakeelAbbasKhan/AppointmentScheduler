@@ -78,7 +78,7 @@ function InitializeCalendar() {
 
 function onShowModal(obj, isEventDetail) {
     if (isEventDetail != null) {
-        debugger;
+      //  debugger;
 
         $("#title").val(obj.title);
         $("#description").val(obj.description);
@@ -100,6 +100,7 @@ function onShowModal(obj, isEventDetail) {
             $("#btnSubmit").addClass("d-none")
         }
         $("#btnDelete").removeClass("d-none")
+
         
         
 

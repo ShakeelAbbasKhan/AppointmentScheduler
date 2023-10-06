@@ -1,3 +1,4 @@
+using AppointmentScheduler.DbInitializer;
 using AppointmentScheduler.Models;
 using AppointmentScheduler.Services;
 using Microsoft.AspNetCore.Identity;
@@ -17,6 +18,8 @@ builder.Services.AddTransient<IAppoitmentService, AppoitmentService>();
 // configure the Identity 
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddScoped<IDbInitializer, DbInitializer>(); 
+
 builder.Services.AddHttpContextAccessor();
 
 //configure the AddDistributedMemoryCache for sessions
@@ -42,6 +45,14 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+
+// to create a admin if not exist in Db 
+using (var scope = app.Services.CreateScope())
+{
+    var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+    // use dbInitializer
+    dbInitializer.Initialize();
 }
 
 app.UseHttpsRedirection();
